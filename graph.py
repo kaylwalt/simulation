@@ -1,6 +1,7 @@
 class Node:
     def __init__(self, pos, neighbors=[], edge=1):
         self.pos = pos
+        self.dead = False
         # dictionary of parent node pos's
         # key = pos of parent
         # value = (edge cost,)

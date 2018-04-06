@@ -13,7 +13,7 @@ pygame.font.init()
 basicfont = pygame.font.SysFont(pygame.font.get_default_font(), 20)
 
 class GridWorld():
-    def __init__(self, x_dim, y_dim, gap, radius, connect8=True):
+    def __init__(self, x_dim, y_dim, gap, radius):
         self.x_dim = x_dim
         self.y_dim = y_dim
         self.gap = gap
@@ -23,12 +23,11 @@ class GridWorld():
         # Go through each element and replace with row (width of grid)
         for i in range(y_dim):
             self.cells[i] = [0] * x_dim
-        # will this be an 8-connected graph or 4-connected?
-        self.connect8 = connect8
+
         self.graph = Graph()
 
         self.generateGraphFromGrid()
-        # self.printGrid()
+
         self.redraw_rects = []
 
     def __getitem__(self, pos):
@@ -55,8 +54,11 @@ class GridWorld():
         WINDOW_SIZE = (self.x_dim * self.gap + 4 * self.radius, self.y_dim * self.gap + 4 * self.radius)
         lines = []
         for pos in self:
+            node = self[pos]
             if pos == self.graph.goal:
                 COLOR = (153, 51, 255)
+            elif node.dead:
+                COLOR = (80, 80, 80)
             else:
                 COLOR = (102, 204, 255)
             node = self.graph.nodes[pos]
@@ -65,12 +67,11 @@ class GridWorld():
             self.redraw_rects += [pygame.draw.circle(surface, COLOR, CENTER, self.radius)]
             self.redraw_rects += [pygame.draw.circle(surface, black, CENTER, self.radius, 1)]
 
-            text = basicfont.render(str(pos), True, (0, 0, 200))
+            text = basicfont.render("g: " + str(node.g), True, (0, 0, 200))
             textrect = text.get_rect()
             textrect.center = CENTER
             self.redraw_rects += [surface.blit(text, textrect)]
 
-            node = self[pos]
             for child in node.children:
                 if [child, pos] not in lines:
                     CCENTER = (child[0]*self.gap+2*self.radius, child[1]*self.gap+2*self.radius)
@@ -91,14 +92,6 @@ class GridWorld():
 
                     point2 = CENTER + ((distance - self.radius) * v)
                     point2 = (int(point2[0]), int(point2[1]))
-                    # print("POS: ", pos)
-                    # print("CHILD: ", child)
-                    # print("norm of d: ", distance)
-                    # print("V: ", v)
-                    # print("D: ", d)
-                    # print("CENTER: ", CENTER)
-                    # print("Point 1: ", point1)
-                    # print("Point 2: ", point2)
                     self.redraw_rects += [pygame.draw.line(surface, linecolor, point1, point2, 5)]
 
             for parent in node.parents:
