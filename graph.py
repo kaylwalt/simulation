@@ -27,6 +27,11 @@ class Node:
     def update_parents(self, parents):
         self.parents = parents
 
+    def addNeighbor(self, pos, edge=1):
+        self.parents[pos] = edge
+        self.children[pos] = edge
+
+
 
 class Graph:
     def __init__(self):
@@ -42,6 +47,15 @@ class Graph:
 
     def __repr__(self):
         return self.__str__()
+
+    def __getitem__(self, pos):
+        return self.nodes[pos]
+
+    def __setitem__(self, pos, node):
+        self.nodes[pos] = node
+
+    def __iter__(self):
+        return self.nodes.__iter__()
 
     def addNode(self, node):
         self.nodes[node.pos] = node
